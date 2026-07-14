@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('internal_code');
+            $table->string('internal_code')->unique();
             $table->string('name');
             $table->text('description');
-            $table->integer('default_unit_price');
+            $table->decimal('default_unit_price', 10, 2);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -9,9 +9,8 @@ class FindItemAction
 {
     public function findOne(string $id): Item
     {
-        return Item::query()->find($id, 'id');
+        return Item::query()->findOrFail($id);
     }
-
 
     public function find(int $page, string $search, int $perPage): LengthAwarePaginator
     {
@@ -20,7 +19,7 @@ class FindItemAction
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('internal_code', 'like', "%{$search}%");
             });
         }
 

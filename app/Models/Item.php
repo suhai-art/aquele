@@ -23,12 +23,11 @@ class Item extends Model
         'name',
         'description',
         'default_unit_price',
-        'production_time_hours',
     ];
 
     protected $casts = [
         'default_unit_price' => 'decimal:2',
-        'production_time_hours' => 'integer',
+        'is_active' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',

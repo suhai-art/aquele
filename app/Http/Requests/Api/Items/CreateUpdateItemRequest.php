@@ -12,7 +12,7 @@ class CreateUpdateItemRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,11 +23,10 @@ class CreateUpdateItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => ['sometimes', 'uuid', 'exists:items,id'],
             'internal_code' => ['required', 'string'],
             'name' => ['required', 'string'],
             'description' => ['required', 'string'],
-            'default_unit_price' => ['required', 'integer'],
+            'default_unit_price' => ['required', 'numeric', 'min:0'],
         ];
     }
 }

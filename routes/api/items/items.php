@@ -1,7 +1,6 @@
-
 <?php
 
-use App\Http\Controllers\ItemsController;
+use App\Http\Controllers\Api\ItemsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('items')->middleware('auth:sanctum')->group(function () {
@@ -10,5 +9,5 @@ Route::prefix('items')->middleware('auth:sanctum')->group(function () {
     Route::put('/{id}', [ItemsController::class, 'createUpdate']);
     Route::put('/{id}/toggle-active', [ItemsController::class, 'toggleActive']);
     Route::get('/{id}', [ItemsController::class, 'findOne']);
-    Route::delete('/{id}', [ItemsController::class, 'toggleActive']);
+    Route::delete('/{id}', [ItemsController::class, 'delete']);
 });
