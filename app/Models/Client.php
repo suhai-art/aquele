@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Item extends Model
+class Client extends Model
 {
     use SoftDeletes, HasUuids, HasFactory;
 
-    protected $table = 'items';
+    protected $table = 'clients';
 
     protected $primaryKey = 'id';
 
@@ -20,14 +20,11 @@ class Item extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'internal_code',
         'name',
-        'description',
-        'default_unit_price',
+        'document',
     ];
 
     protected $casts = [
-        'default_unit_price' => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',

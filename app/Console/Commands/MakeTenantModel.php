@@ -27,6 +27,12 @@ class MakeTenantModel extends Command
             ]);
         }
 
+        if ($this->option('f')) {
+            $this->call('make:factory', [
+                'name' => $name
+            ]);
+        }
+
         $this->info("Tenant model {$name} criado com sucesso!");
 
         return self::SUCCESS;
