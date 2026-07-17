@@ -38,6 +38,10 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
+        $tenant_name = tenant('name');
+        $response = $request->user();
+
+        $response['tenant'] = $tenant_name;
         return response()->json($request->user());
     }
 }
