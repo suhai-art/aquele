@@ -8,8 +8,8 @@ class DeleteClientAction
 {
     public function execute(string $id): void
     {
-        $item = Client::query()->findOrFail($id);
+        $client = Client::query()->findOrFail($id);
 
-        $item->delete();
+        $client->delete();
     }
 }

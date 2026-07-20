@@ -6,8 +6,8 @@ use App\Actions\Client\CreateUpdateClientAction;
 use App\Actions\Client\DeleteClientAction;
 use App\Actions\Client\FindClientAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Clients\CreateUpdateClientRequest;
 use App\Http\Requests\Api\FindRequest;
-use App\Http\Requests\Api\Items\CreateUpdateItemRequest;
 use Illuminate\Http\JsonResponse;
 
 class ClientsController extends Controller
@@ -38,7 +38,7 @@ class ClientsController extends Controller
         return response()->json($item);
     }
 
-    public function createUpdate(CreateUpdateItemRequest $request, ?string $id = null): JsonResponse
+    public function createUpdate(CreateUpdateClientRequest $request, ?string $id = null): JsonResponse
     {
         $data = $request->validated();
 
@@ -56,6 +56,6 @@ class ClientsController extends Controller
     {
         $this->deleteClientAction->execute($id);
 
-        return response()->json(['message' => 'Item removido com sucesso.']);
+        return response()->json(['message' => 'Client removido com sucesso.']);
     }
 }

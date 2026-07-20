@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Actions\Item;
+namespace App\Actions\Client;
 
-use App\Models\Item;
+use App\Models\Client;
 
-class CreateUpdateItemAction
+class CreateUpdateClientAction
 {
-    public function execute(array $data, ?string $id = null): Item
+    public function execute(array $data, ?string $id = null): Client
     {
-        $item = $id !== null
-            ? Item::query()->findOrFail($id)
-            : new Item();
+        $client = $id !== null
+            ? Client::query()->findOrFail($id)
+            : new Client();
 
-        $item->fill($data);
-        $item->save();
+        $client->fill($data);
+        $client->save();
 
-        return $item;
+        return $client;
     }
 }
