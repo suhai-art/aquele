@@ -13,15 +13,30 @@ class RoleMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (Symfony\Component\HttpFoundation\Response)  $next
+     * The $role parameter accepts a single role or a comma-separated list
+     * of roles. Access is granted when the authenticated user has any of
+     * the given roles (powered by spatie/laravel-permission).
+     *
+     * A user holding the "root" role bypasses any role restriction.
+     *
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        if (! $request->user()) {
-            throw new AuthenticationException();
+        $user = $request->user();
+
+        if (! $user) {
+            throw new AuthenticationException;
         }
 
-        if ($request->user()->role !== $role) {
+        // Super-admin role bypasses every restriction.
+        if ($user->hasRole('root')) {
+            return $next($request);
+        }
+
+        $roles = str_contains($role, ',') ? explode(',', $role) : $role;
+
+        if (! $user->hasAnyRole($roles)) {
             return new JsonResponse([
                 'success' => false,
                 'message' => 'Acesso negado. Permissão insuficiente.',

@@ -13,10 +13,10 @@ class UsersControllerTest extends TestCase
     public function test_authenticated_user_can_list_users(): void
     {
         User::factory()->count(3)->create();
-        $user = User::factory()->create(['role' => 'admin']);
-        Sanctum::actingAs($user);
+        $admin = $this->createUserWithRole('admin');
+        Sanctum::actingAs($admin);
 
-        $response = $this->getJson($this->baseUrl . '/api/users');
+        $response = $this->getJson($this->baseUrl.'/api/users');
 
         $response->assertOk()
             ->assertJson([
@@ -30,26 +30,26 @@ class UsersControllerTest extends TestCase
 
     public function test_guest_cannot_list_users(): void
     {
-        $this->getJson($this->baseUrl . '/api/users')
+        $this->getJson($this->baseUrl.'/api/users')
             ->assertUnauthorized();
     }
 
     public function test_non_admin_cannot_list_users(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = $this->createUserWithRole('user');
         Sanctum::actingAs($user);
 
-        $this->getJson($this->baseUrl . '/api/users')
+        $this->getJson($this->baseUrl.'/api/users')
             ->assertForbidden();
     }
 
     public function test_authenticated_admin_can_find_one_user(): void
     {
         $user = User::factory()->create();
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = $this->createUserWithRole('admin');
         Sanctum::actingAs($admin);
 
-        $response = $this->getJson($this->baseUrl . '/api/users/' . $user->id);
+        $response = $this->getJson($this->baseUrl.'/api/users/'.$user->id);
 
         $response->assertOk()
             ->assertJson([
@@ -63,10 +63,10 @@ class UsersControllerTest extends TestCase
 
     public function test_authenticated_admin_can_create_a_user(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = $this->createUserWithRole('admin');
         Sanctum::actingAs($admin);
 
-        $response = $this->postJson($this->baseUrl . '/api/users', [
+        $response = $this->postJson($this->baseUrl.'/api/users', [
             'name' => 'New User',
             'email' => 'newuser@example.com',
             'password' => 'password123',
@@ -82,17 +82,20 @@ class UsersControllerTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => 'newuser@example.com',
             'name' => 'New User',
-            'role' => 'admin',
+            'status' => 'active',
         ]);
+
+        $created = User::query()->where('email', 'newuser@example.com')->firstOrFail();
+        $this->assertTrue($created->hasRole('admin'));
     }
 
     public function test_authenticated_admin_can_update_a_user(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = $this->createUserWithRole('admin');
         Sanctum::actingAs($admin);
         $user = User::factory()->create();
 
-        $response = $this->putJson($this->baseUrl . '/api/users/' . $user->id, [
+        $response = $this->putJson($this->baseUrl.'/api/users/'.$user->id, [
             'name' => 'Updated Name',
             'email' => $user->email,
             'password' => 'password',
@@ -106,18 +109,20 @@ class UsersControllerTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'name' => 'Updated Name',
-            'role' => 'admin',
             'status' => 'inactive',
         ]);
+
+        $user->refresh();
+        $this->assertTrue($user->hasRole('admin'));
     }
 
     public function test_authenticated_admin_can_delete_a_user(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = $this->createUserWithRole('admin');
         Sanctum::actingAs($admin);
         $user = User::factory()->create();
 
-        $response = $this->deleteJson($this->baseUrl . '/api/users/' . $user->id);
+        $response = $this->deleteJson($this->baseUrl.'/api/users/'.$user->id);
 
         $response->assertOk()
             ->assertJson([
@@ -130,11 +135,11 @@ class UsersControllerTest extends TestCase
 
     public function test_authenticated_admin_can_toggle_user_status(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = $this->createUserWithRole('admin');
         Sanctum::actingAs($admin);
         $user = User::factory()->create(['status' => 'active']);
 
-        $response = $this->putJson($this->baseUrl . '/api/users/' . $user->id . '/toggle-active');
+        $response = $this->putJson($this->baseUrl.'/api/users/'.$user->id.'/toggle-active');
 
         $response->assertOk()
             ->assertJson([
@@ -145,21 +150,21 @@ class UsersControllerTest extends TestCase
 
     public function test_create_user_requires_name_email_and_password(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = $this->createUserWithRole('admin');
         Sanctum::actingAs($admin);
 
-        $response = $this->postJson($this->baseUrl . '/api/users', []);
+        $response = $this->postJson($this->baseUrl.'/api/users', []);
 
         $response->assertStatus(422);
     }
 
     public function test_create_user_requires_unique_email(): void
     {
-        $admin = User::factory()->create(['role' => 'admin']);
+        $admin = $this->createUserWithRole('admin');
         Sanctum::actingAs($admin);
         $existing = User::factory()->create();
 
-        $response = $this->postJson($this->baseUrl . '/api/users', [
+        $response = $this->postJson($this->baseUrl.'/api/users', [
             'name' => 'New User',
             'email' => $existing->email,
             'password' => 'password123',
